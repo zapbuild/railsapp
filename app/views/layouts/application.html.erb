@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html> 
+<head> 
+  <title>Myrailsapp</title>
+  <%= stylesheet_link_tag    "application", :media => "all" %>
+  <%= javascript_include_tag "application" %>
+  <%= csrf_meta_tags %>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATkUTxm8C3b1DrJpGg6u_0dju63RFWuek&sensor=true"></script>
+<script type="text/javascript">
+ //initialise the infowindow so it's ready for use
+    var infowindow = null;
+
+    //function to actually initialise the map
+    function initialize() {
+        //set your latitude and longitude as per the previous article, specify the default 
+        //zoom and set the default map type to RoadMap
+        var latlng = new google.maps.LatLng(-32.8333, 115.917);
+        var myOptions = {
+            zoom: 1,
+            center: latlng,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        
+        //place the map on the canvas
+        var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+        
+        //Set all your markers, the magic happens in another function - setMarkers(map, markers) which gets called
+        setMarkers(map, items);
+        infowindow = new google.maps.InfoWindow({
+        content: "holding..."
+        });
+    }
+  
+    //build an array of your markers here
+    //title shows on hover so no html in there
+    //obviously replace the latitude and longitudes with the appropriate numbers
+    //z-index is the stacking order of the markers - which do you want on top... generally incrementing this by 1 each time will be fine
+    //infowindow content can have html in it, so go crazy with what you want the box to say when the marker is clicked
+    var items = [
+        ['title 1 to display on hover', 32.755, 78.464, 1, 'infowindow 1 content'],
+        ['title 2 to display on hover', 32.655, 64.454, 1, 'infowindow 2 content'],
+        ['title 3 to display on hover', 32.555, 72.444, 1, 'infowindow 3 content']
+    ];
+    
+    //function to actually put the markers on the map
+    function setMarkers(map, markers) {
+        //loop through and place markers
+        for (var i = 0; i < markers.length; i++) 
+        {
+            var sites = markers[i];
+            var siteLatLng = new google.maps.LatLng(sites[1], sites[2]);
+            var marker = new google.maps.Marker({
+                position: siteLatLng,
+                map: map,
+                title: sites[0],
+                zIndex: sites[3],
+                html: sites[4]
+            });
+
+            //initial content string
+            var contentString = "Some content";
+
+            //attach infowindow on click
+            google.maps.event.addListener(marker, "click", function () 
+            {
+                infowindow.setContent(this.html);
+                infowindow.open(map, this);
+            });
+        }
+    }
+</script>
+</head>
+<body onload="initialize()">
+	<%= yield %>
+    <div id="map_canvas" style="width:500px; height:600px;"></div>
+</body>
+</html>
